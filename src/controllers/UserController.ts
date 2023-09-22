@@ -32,11 +32,11 @@ export class UserController {
 
   async update(req: Request, res: Response) {
     const { name, email, password, old_password } = req.body;
-    const { userId } = req.params;
+    const { id } = req.user;
 
     const user = await prisma.user.findUnique({
       where: {
-        id: Number(userId),
+        id,
       },
     });
 
@@ -50,7 +50,7 @@ export class UserController {
       },
     });
 
-    if (emailAlreadyExists && user.id !== Number(userId)) {
+    if (emailAlreadyExists && user.id !== id) {
       throw new AppError("Este e-mail já está sendo utilizado");
     }
 
@@ -71,12 +71,11 @@ export class UserController {
       user.password = await hash(password, 8);
     }
 
-    const {updated_at, ...
-      updatedUser} = user
+    const { updated_at, ...updatedUser } = user;
 
     await prisma.user.update({
       where: {
-        id: Number(userId),
+        id,
       },
       data: {
         ...updatedUser,
