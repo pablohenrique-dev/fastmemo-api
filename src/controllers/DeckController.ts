@@ -24,6 +24,9 @@ export class DeckController {
         id: Number(deckId),
         userId,
       },
+      include: {
+        cards: true,
+      },
     });
 
     if (!deck) {
@@ -110,8 +113,15 @@ export class DeckController {
     });
 
     if (!deck) {
-      throw new AppError("Deck não encontrado!");
+      throw new AppError("Deck não encontrado!", 404);
     }
+
+    await prisma.card.deleteMany({
+      where: {
+        userId,
+        deckId: Number(deckId)
+      }
+    })
 
     await prisma.deck.delete({
       where: {
@@ -120,6 +130,6 @@ export class DeckController {
       },
     });
 
-    return res.json();
+    return res.status(204).json();
   }
 }

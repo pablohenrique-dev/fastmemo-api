@@ -78,6 +78,25 @@ export class CardsController {
     return res.json(cards);
   }
 
+  async show(req: Request, res: Response) {
+    const { deckId, cardId } = req.params;
+    const userId = req.user.id;
+
+    const card = await prisma.card.findUnique({
+      where: {
+        id: Number(cardId),
+        deckId: Number(deckId),
+        userId,
+      },
+    });
+
+    if (!card) {
+      throw new AppError("Card não encontrado!", 404);
+    }
+
+    return res.json(card);
+  }
+
   async delete(req: Request, res: Response) {
     const { cardId } = req.params;
     const userId = req.user.id;
