@@ -28,7 +28,7 @@ model Deck {
   name       String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  User       User     @relation(fields: [userId], references: [id])
+  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     Int
 
   cards Card[]
@@ -42,8 +42,8 @@ model Card {
   updated_at  DateTime @updatedAt
   next_review DateTime
 
-  User   User @relation(fields: [userId], references: [id])
+  User   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
-  Deck   Deck @relation(fields: [deckId], references: [id])
+  Deck   Deck @relation(fields: [deckId], references: [id], onDelete: Cascade)
   deckId Int
 }
