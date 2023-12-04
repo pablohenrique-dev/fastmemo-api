@@ -66,12 +66,17 @@ export class CardsController {
 
   async index(req: Request, res: Response) {
     const { deckId } = req.params;
+    const { search } = req.query;
+
     const userId = req.user.id;
 
     const cards = await prisma.card.findMany({
       where: {
         deckId: Number(deckId),
         userId,
+        front: {
+          contains: search && typeof search === "string" ? search : "",
+        }
       },
     });
 
