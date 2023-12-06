@@ -1,0 +1,11 @@
+-- CreateTable
+CREATE TABLE "CardReviewCount" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "count" INTEGER NOT NULL DEFAULT 0,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" DATETIME NOT NULL,
+    "cardId" INTEGER NOT NULL,
+    "userId" INTEGER NOT NULL,
+    CONSTRAINT "CardReviewCount_cardId_fkey" FOREIGN KEY ("cardId") REFERENCES "Card" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "CardReviewCount_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
