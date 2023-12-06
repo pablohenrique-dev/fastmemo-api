@@ -21,7 +21,7 @@ export class CardsController {
   }
 
   async update(req: Request, res: Response) {
-    const { front, back, next_review } = req.body;
+    const { front, back } = req.body;
     const { cardId } = req.params;
     const userId = req.user.id;
 
@@ -34,20 +34,6 @@ export class CardsController {
 
     if (!card) {
       throw new AppError("Card não encontrado!", 404);
-    }
-
-    if (next_review && !front && !back) {
-      await prisma.card.update({
-        where: {
-          userId,
-          id: Number(cardId),
-        },
-        data: {
-          next_review,
-        },
-      });
-
-      return res.status(201).json();
     }
 
     await prisma.card.update({
