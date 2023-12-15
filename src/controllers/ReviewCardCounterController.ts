@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../prisma/client";
-import { formatDateToday } from "../utils/handleDate";
+import { formatDateToday, shiftDayOfADate } from "../utils/handleDate";
 
 export class ReviewCardCounterController {
   async update(req: Request, res: Response) {
@@ -21,8 +21,8 @@ export class ReviewCardCounterController {
     const reviewCardCounter = await prisma.cardReviewCount.findFirst({
       where: {
         created_at: {
-          lte: `${formatDateToday()}T23:59:59.999Z`,
-          gte: `${formatDateToday()}T00:00:00.000Z`,
+          lt: shiftDayOfADate(formatDateToday(), 1),
+          gte: formatDateToday(),
         },
         cardId: Number(cardId),
         userId: userId,
@@ -44,6 +44,7 @@ export class ReviewCardCounterController {
     await prisma.cardReviewCount.update({
       where: {
         id: reviewCardCounter.id,
+        userId,
       },
       data: {
         count: {
@@ -56,11 +57,28 @@ export class ReviewCardCounterController {
   }
 
   async index(req: Request, res: Response) {
+    const { initialDate, finalDate } = req.query;
     const userId = req.user.id;
+
+    const initialDateQueryParam =
+      initialDate && typeof initialDate === "string"
+        ? new Date(initialDate)
+        : shiftDayOfADate(new Date(), -30);
+    const finalDateQueryParam =
+      finalDate && typeof finalDate === "string"
+        ? shiftDayOfADate(finalDate, 1)
+        : new Date();
 
     const allReviews = await prisma.cardReviewCount.findMany({
       where: {
         userId,
+        created_at: {
+          lte: finalDateQueryParam,
+          gte: initialDateQueryParam,
+        },
+      },
+      orderBy: {
+        created_at: "asc",
       },
     });
 
